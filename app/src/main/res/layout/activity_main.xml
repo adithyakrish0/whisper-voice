@@ -1,239 +1,468 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Modern monochromatic ChatGPT-style main activity -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#1A1A1A"
     android:fitsSystemWindows="true">
+
+    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:background="#1A1A1A">
+        
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Whisper Voice"
+            android:textSize="20sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+        
+        <ImageButton
+            android:id="@+id/btnInfo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_info_48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="#888888"
+            android:contentDescription="@string/info" />
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#2A2A2A" />
+
+    <!-- Main content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+        
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="@color/colorAccent"
-                android:text="@string/select_model" />
-
-            <Spinner
-                android:id="@+id/spnrTfliteFiles"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/layout_language"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="@color/colorAccent"
-                android:text="@string/language" />
-
-            <Spinner
-                android:id="@+id/spnrLanguage"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/tvStatusTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="@color/colorAccent"
-                android:text="@string/status"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:layout_marginStart="8dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:textSize="16sp"
-                android:textColor="@color/colorAccent"
-                android:text="@string/append" />
-
-            <CheckBox
-                android:id="@+id/mode_append"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:contentDescription="@string/append"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:textSize="16sp"
-                android:textColor="@color/colorAccent"
-                android:text="@string/translate" />
-
-            <CheckBox
-                android:id="@+id/mode_translate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:contentDescription="@string/translate"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_tts"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:gravity="start">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:textSize="16sp"
-                android:textColor="@color/colorAccent"
-                android:text="@string/text_to_speech" />
-
-            <CheckBox
-                android:id="@+id/mode_tts"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:contentDescription="@string/text_to_speech"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_mode_chinese"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:gravity="start">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:textSize="16sp"
-                android:textColor="@color/colorAccent"
-                android:text="@string/simple_chinese" />
-
-            <CheckBox
-                android:id="@+id/mode_simple_chinese"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:contentDescription="@string/simple_chinese"/>
-
-        </LinearLayout>
-        <!-- Use ProgressBar as "Space" with same look -->
-        <ProgressBar
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:indeterminate="false"
-            android:indeterminateTint="@color/colorAccent"
-            style="?android:attr/progressBarStyleHorizontal"/>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-            <ScrollView
-                android:id="@+id/scrollView"
+            <!-- Model Selection Card -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+                
                 <TextView
-                    android:id="@+id/tvResult"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/select_model"
+                    android:textSize="14sp"
+                    android:textColor="#888888"
+                    android:layout_marginBottom="8dp" />
+                
+                <Spinner
+                    android:id="@+id/spnrTfliteFiles"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/spinner_background"
+                    android:popupBackground="#2A2A2A" />
+            </LinearLayout>
+
+            <!-- Language Selection Card -->
+            <LinearLayout
+                android:id="@+id/layout_language"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+                
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/language"
+                    android:textSize="14sp"
+                    android:textColor="#888888"
+                    android:layout_marginBottom="8dp" />
+                
+                <Spinner
+                    android:id="@+id/spnrLanguage"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/spinner_background"
+                    android:popupBackground="#2A2A2A" />
+            </LinearLayout>
+
+            <!-- GLOBAL OPTIONS Card (affects all modes) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+                
+                <!-- Translate Option - GLOBAL -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text = "@string/instructions"
-                    android:textSize="16sp" />
-            </ScrollView>
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fabCopy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="3dp"
-                android:layout_marginBottom="10dp"
-                android:contentDescription="@string/copy_to_clipboard"
-                android:src="@drawable/ic_copy" />
-        </RelativeLayout>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/translate"
+                            android:textSize="16sp"
+                            android:textColor="#E0E0E0" />
+                        
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Translate any language to English"
+                            android:textSize="12sp"
+                            android:textColor="#666666" />
+                    </LinearLayout>
+                    
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/mode_translate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:thumbTint="#FFFFFF"
+                        android:trackTint="#3A3A3A" />
+                </LinearLayout>
+            </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/processing_bar"
+            <!-- KEYBOARD MODE OPTIONS Card -->
+            <!-- KEYBOARD MODE OPTIONS Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+                
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Keyboard Mode"
+                    android:textSize="14sp"
+                    android:textColor="#888888"
+                    android:layout_marginBottom="12dp" />
+                
+                <!-- Append Option - keyboard only -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/append"
+                            android:textSize="16sp"
+                            android:textColor="#E0E0E0" />
+                        
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Add text instead of replacing"
+                            android:textSize="12sp"
+                            android:textColor="#666666" />
+                    </LinearLayout>
+                    
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/mode_append"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:thumbTint="#FFFFFF"
+                        android:trackTint="#3A3A3A" />
+                </LinearLayout>
+                
+                <!-- Hidden options (kept for compatibility) -->
+                <LinearLayout
+                    android:id="@+id/layout_tts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:orientation="horizontal">
+                    <CheckBox android:id="@+id/mode_tts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone" />
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:id="@+id/layout_mode_chinese"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:orientation="horizontal">
+                    <CheckBox android:id="@+id/mode_simple_chinese" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- FLOATING MODE OPTIONS Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+                
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Floating Mode"
+                    android:textSize="14sp"
+                    android:textColor="#888888"
+                    android:layout_marginBottom="12dp" />
+                
+                <!-- Button Size Option -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Button Size"
+                        android:textSize="16sp"
+                        android:textColor="#E0E0E0"
+                        android:layout_marginBottom="12dp" />
+                    
+                    <!-- Size selector buttons -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+                        
+                        <Button
+                            android:id="@+id/btnSizeSmall"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:text="Small"
+                            android:textSize="12sp"
+                            android:textColor="#AAAAAA"
+                            android:background="@drawable/button_dark"
+                            android:textAllCaps="false" />
+                        
+                        <Button
+                            android:id="@+id/btnSizeMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:layout_marginHorizontal="4dp"
+                            android:text="Medium"
+                            android:textSize="12sp"
+                            android:textColor="#FFFFFF"
+                            android:background="@drawable/button_dark"
+                            android:textAllCaps="false" />
+                        
+                        <Button
+                            android:id="@+id/btnSizeLarge"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="4dp"
+                            android:text="Large"
+                            android:textSize="12sp"
+                            android:textColor="#AAAAAA"
+                            android:background="@drawable/button_dark"
+                            android:textAllCaps="false" />
+                    </LinearLayout>
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Restart floating mode to apply"
+                        android:textSize="11sp"
+                        android:textColor="#555555"
+                        android:layout_marginTop="8dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Status Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    
+                    <TextView
+                        android:id="@+id/tvStatusTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/status"
+                        android:textSize="14sp"
+                        android:textColor="#888888" />
+                    
+                    <TextView
+                        android:id="@+id/tvStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:textSize="14sp"
+                        android:textColor="#4CAF50" />
+                </LinearLayout>
+                
+                <ProgressBar
+                    android:id="@+id/processing_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_marginTop="12dp"
+                    android:indeterminate="false"
+                    android:progressTint="#FFFFFF"
+                    android:progressBackgroundTint="#3A3A3A"
+                    style="@android:style/Widget.ProgressBar.Horizontal" />
+            </LinearLayout>
+
+            <!-- Result Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:padding="16dp"
+                android:minHeight="100dp">
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+                    
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Transcription"
+                        android:textSize="14sp"
+                        android:textColor="#888888" />
+                    
+                    <ImageButton
+                        android:id="@+id/fabCopy"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_copy"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:tint="#888888"
+                        android:contentDescription="@string/copy_to_clipboard" />
+                </LinearLayout>
+                
+                <ScrollView
+                    android:id="@+id/scrollView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxHeight="150dp">
+                    
+                    <TextView
+                        android:id="@+id/tvResult"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/instructions"
+                        android:textSize="16sp"
+                        android:textColor="#E0E0E0"
+                        android:lineSpacingMultiplier="1.3" />
+                </ScrollView>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Action Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#1A1A1A"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="24dp">
+        
+        <!-- Record Button -->
+        <ImageButton
+            android:id="@+id/btnRecord"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_mic_white"
+            android:background="@drawable/record_button_background"
+            android:scaleType="centerInside"
+            android:padding="16dp"
+            android:contentDescription="@string/record_button" />
+        
+        <!-- Action Buttons Row -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:indeterminate="false"
-            android:progressTint="@color/colorAccent"
-            android:indeterminateTint="@color/colorAccent"
-            style="?android:attr/progressBarStyleHorizontal"/>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal">
-
-            <ImageButton
-                android:id="@+id/btnRecord"
-                android:layout_width="96dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:layout_centerHorizontal="true"
-                android:background="@drawable/rounded_button_background"
-                android:contentDescription="@string/record_button"
-                android:src="@drawable/ic_mic_48dp" />
-
-            <ImageButton
-                android:id="@+id/btnInfo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:background="@null"
-                android:contentDescription="@string/info"
-                android:src="@drawable/ic_info_48dp" />
-        </RelativeLayout>
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
+            android:gravity="center">
+            
+            <!-- Floating Mode Button -->
+            <Button
+                android:id="@+id/btnFloatingMode"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:text="@string/start_floating_mode"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:background="@drawable/button_dark"
+                android:textAllCaps="false" />
+                
+            <!-- Whitelist Apps Button -->
+            <Button
+                android:id="@+id/btnWhitelist"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:text="Select Apps"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:background="@drawable/button_dark"
+                android:textAllCaps="false" />
+        </LinearLayout>
     </LinearLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</LinearLayout>

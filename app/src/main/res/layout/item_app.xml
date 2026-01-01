@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="16dp"
+    android:background="?attr/selectableItemBackground"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!-- App icon -->
+    <ImageView
+        android:id="@+id/app_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:scaleType="fitCenter" />
+    
+    <!-- App name -->
+    <TextView
+        android:id="@+id/app_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="16sp"
+        android:textColor="#E0E0E0"
+        android:maxLines="1"
+        android:ellipsize="end" />
+    
+    <!-- Simple Switch instead of Checkbox for cleaner look -->
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/app_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:thumbTint="#FFFFFF"
+        android:trackTint="#3A3A3A" />
+
+</LinearLayout>

@@ -12,6 +12,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 import android.provider.Settings;
@@ -25,6 +27,7 @@ import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -46,6 +49,8 @@ import com.whispertflite.utils.HapticFeedback;
 import com.whispertflite.utils.InputLang;
 import com.whispertflite.utils.LanguagePairAdapter;
 import com.whispertflite.utils.ThemeUtils;
+import com.whispertflite.overlay_mode.FloatingOverlayService;
+import com.whispertflite.overlay_mode.WhitelistAppsActivity;
 
 import org.woheller69.freeDroidWarn.FreeDroidWarn;
 
@@ -73,16 +78,18 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView tvStatus;
     private TextView tvResult;
-    private FloatingActionButton fabCopy;
+    private ImageButton fabCopy;
     private ImageButton btnRecord;
     private LinearLayout layoutModeChinese;
     private LinearLayout layoutTTS;
-    private CheckBox append;
-    private CheckBox translate;
+    private androidx.appcompat.widget.SwitchCompat append;
+    private androidx.appcompat.widget.SwitchCompat translate;
     private CheckBox modeSimpleChinese;
     private CheckBox modeTTS;
     private ProgressBar processingBar;
     private ImageButton btnInfo;
+    private Button btnFloatingMode;
+    private boolean isFloatingModeActive = false;
 
     private Recorder mRecorder = null;
     private Whisper mWhisper = null;
@@ -161,7 +168,24 @@ public class MainActivity extends AppCompatActivity {
         initModel();
 
         btnInfo = findViewById(R.id.btnInfo);
-        btnInfo.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/woheller69/whisperIME#Donate"))));
+        btnInfo.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/adithyakrish0/whisper-voice"))));
+
+        // Floating Mode Button
+        btnFloatingMode = findViewById(R.id.btnFloatingMode);
+        updateFloatingModeButton();
+        btnFloatingMode.setOnClickListener(v -> toggleFloatingMode());
+        
+        // Whitelist Apps Button
+        Button btnWhitelist = findViewById(R.id.btnWhitelist);
+        btnWhitelist.setOnClickListener(v -> {
+            startActivity(new Intent(this, WhitelistAppsActivity.class));
+        });
+        
+        // Floating overlay size buttons
+        setupSizeButtons();
+        
+        // Auto-start floating mode on app init
+        autoStartFloatingMode();
 
         spinnerLanguage = findViewById(R.id.spnrLanguage);
         List<Pair<String, String>> languagePairs = LanguagePairAdapter.getLanguagePairs(this);
@@ -512,6 +536,129 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return filteredFiles;
+    }
+
+    // ============== Floating Mode Methods ==============
+
+    private void toggleFloatingMode() {
+        if (isFloatingModeActive) {
+            stopFloatingMode();
+        } else {
+            startFloatingMode();
+        }
+    }
+
+    private void startFloatingMode() {
+        // Check for overlay permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            // Request overlay permission
+            Toast.makeText(this, getString(R.string.enable_overlay_permission), Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, 1234);
+            return;
+        }
+
+        // Start the floating overlay service
+        Intent serviceIntent = new Intent(this, FloatingOverlayService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
+
+        isFloatingModeActive = true;
+        updateFloatingModeButton();
+        Toast.makeText(this, "Floating mode started", Toast.LENGTH_SHORT).show();
+    }
+
+    private void stopFloatingMode() {
+        Intent serviceIntent = new Intent(this, FloatingOverlayService.class);
+        stopService(serviceIntent);
+
+        isFloatingModeActive = false;
+        updateFloatingModeButton();
+        Toast.makeText(this, "Floating mode stopped", Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateFloatingModeButton() {
+        if (btnFloatingMode != null) {
+            btnFloatingMode.setText(isFloatingModeActive ? 
+                    getString(R.string.stop_floating_mode) : 
+                    getString(R.string.start_floating_mode));
+        }
+    }
+    
+    private void autoStartFloatingMode() {
+        // Auto-start floating mode if overlay permission is already granted
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
+            // Small delay to ensure UI is ready
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                if (!isFloatingModeActive) {
+                    startFloatingMode();
+                }
+            }, 500);
+        }
+    }
+    
+    private void setupSizeButtons() {
+        Button btnSmall = findViewById(R.id.btnSizeSmall);
+        Button btnMedium = findViewById(R.id.btnSizeMedium);
+        Button btnLarge = findViewById(R.id.btnSizeLarge);
+        
+        // Read current preference
+        int currentSize = sp.getInt(FloatingOverlayService.PREF_OVERLAY_SIZE, 1);
+        updateSizeButtonColors(btnSmall, btnMedium, btnLarge, currentSize);
+        
+        btnSmall.setOnClickListener(v -> {
+            sp.edit().putInt(FloatingOverlayService.PREF_OVERLAY_SIZE, 0).apply();
+            updateSizeButtonColors(btnSmall, btnMedium, btnLarge, 0);
+            restartFloatingModeIfActive();
+        });
+        
+        btnMedium.setOnClickListener(v -> {
+            sp.edit().putInt(FloatingOverlayService.PREF_OVERLAY_SIZE, 1).apply();
+            updateSizeButtonColors(btnSmall, btnMedium, btnLarge, 1);
+            restartFloatingModeIfActive();
+        });
+        
+        btnLarge.setOnClickListener(v -> {
+            sp.edit().putInt(FloatingOverlayService.PREF_OVERLAY_SIZE, 2).apply();
+            updateSizeButtonColors(btnSmall, btnMedium, btnLarge, 2);
+            restartFloatingModeIfActive();
+        });
+    }
+    
+    private void restartFloatingModeIfActive() {
+        if (isFloatingModeActive) {
+            stopFloatingMode();
+            // Small delay to ensure service is stopped before restarting
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                startFloatingMode();
+            }, 300);
+        }
+    }
+    
+    private void updateSizeButtonColors(Button small, Button medium, Button large, int selectedIndex) {
+        int activeColor = 0xFFFFFFFF; // White
+        int inactiveColor = 0xFFAAAAAA; // Gray
+        
+        small.setTextColor(selectedIndex == 0 ? activeColor : inactiveColor);
+        medium.setTextColor(selectedIndex == 1 ? activeColor : inactiveColor);
+        large.setTextColor(selectedIndex == 2 ? activeColor : inactiveColor);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1234) {
+            // Check if permission was granted after returning from settings
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
+                startFloatingMode();
+            } else {
+                Toast.makeText(this, getString(R.string.overlay_permission_required), Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 }

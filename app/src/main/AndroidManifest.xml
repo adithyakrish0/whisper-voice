@@ -17,6 +17,13 @@
     <uses-permission
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
+    
+    <!-- Overlay permission for floating voice assistant -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    
+    <!-- Prevent service from being killed -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
         android:allowBackup="false"
@@ -59,6 +66,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".overlay_mode.WhitelistAppsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Whisper.NoActionBar" />
+
         <service
             android:name=".WhisperInputMethodService"
             android:permission="android.permission.BIND_INPUT_METHOD"
@@ -97,6 +109,25 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+
+        <!-- Floating Overlay Service -->
+        <service
+            android:name=".overlay_mode.FloatingOverlayService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
+        <!-- Text Injection Accessibility Service -->
+        <service
+            android:name=".overlay_mode.TextInjectorService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
 
     </application>
 </manifest>

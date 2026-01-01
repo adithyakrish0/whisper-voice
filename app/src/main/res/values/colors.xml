@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
-    <color name="lightGrey">#DDDDDD</color>
-    <color name="darkGrey">#999999</color>
-    <color name="colorAccent">#996750A4</color>
-    <color name="colorAccentDark">#ff6750A4</color>
-    <color name="windowBackground">#FAFAFA</color>
+    <color name="lightGrey">#1F1F1F</color>
+    <color name="darkGrey">#3A3A3A</color>
+    <color name="colorAccent">#FFFFFF</color>
+    <color name="colorAccentDark">#E0E0E0</color>
+    <color name="windowBackground">#1A1A1A</color>
 </resources>

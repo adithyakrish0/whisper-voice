@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ChatGPT-style mic button - recording state (red accent) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    
+    <solid android:color="#DC2626" />
+    
+    <corners android:radius="12dp" />
+    
+    <size 
+        android:width="44dp"
+        android:height="44dp" />
+        
+</shape>

@@ -86,11 +86,11 @@ public class Recorder {
                 .setSampleRate(SampleRate.SAMPLE_RATE_16K)
                 .setFrameSize(FrameSize.FRAME_SIZE_480)
                 .setMode(Mode.VERY_AGGRESSIVE)
-                .setSilenceDurationMs(800)
-                .setSpeechDurationMs(200)
+                .setSilenceDurationMs(500)  // Reduced from 800ms for faster response
+                .setSpeechDurationMs(150)   // Reduced from 200ms for faster detection
                 .build();
         useVAD = true;
-        Log.d(TAG, "VAD initialized");
+        Log.d(TAG, "VAD initialized with aggressive settings");
     }
 
 

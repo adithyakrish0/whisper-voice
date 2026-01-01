@@ -87,7 +87,7 @@ public class WhisperEngineJava implements WhisperEngine {
     }
 
 
-    // Load TFLite model
+    // Load TFLite model (CPU only - GPU delegate can cause crashes on some devices)
     private void loadModel(String modelPath) throws IOException {
         FileInputStream fileInputStream = new FileInputStream(modelPath);
         FileChannel fileChannel = fileInputStream.getChannel();
@@ -97,11 +97,12 @@ public class WhisperEngineJava implements WhisperEngine {
 
         // Set the number of threads for inference
         Interpreter.Options options = new Interpreter.Options();
-        options.setUseXNNPACK(false);  //cannot be used due to dynamic tensors
+        options.setUseXNNPACK(false);  // Cannot be used due to dynamic tensors
         options.setNumThreads(Runtime.getRuntime().availableProcessors());
         options.setCancellable(true);
 
         mInterpreter = new Interpreter(tfliteModel, options);
+        Log.d(TAG, "Model loaded with CPU");
     }
 
     private float[] getMelSpectrogram() {

@@ -50,6 +50,7 @@ import com.whispertflite.utils.InputLang;
 import com.whispertflite.utils.LanguagePairAdapter;
 import com.whispertflite.utils.ThemeUtils;
 import com.whispertflite.overlay_mode.FloatingOverlayService;
+import com.whispertflite.overlay_mode.TextInjectorService;
 import com.whispertflite.overlay_mode.WhitelistAppsActivity;
 
 import org.woheller69.freeDroidWarn.FreeDroidWarn;
@@ -558,6 +559,14 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, 1234);
             return;
         }
+        
+        // Check for accessibility service
+        if (!isAccessibilityServiceEnabled()) {
+            Toast.makeText(this, "Please enable Whisper Voice accessibility service for text injection", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+            startActivityForResult(intent, 1235);
+            return;
+        }
 
         // Start the floating overlay service
         Intent serviceIntent = new Intent(this, FloatingOverlayService.class);
@@ -570,6 +579,22 @@ public class MainActivity extends AppCompatActivity {
         isFloatingModeActive = true;
         updateFloatingModeButton();
         Toast.makeText(this, "Floating mode started", Toast.LENGTH_SHORT).show();
+    }
+    
+    private boolean isAccessibilityServiceEnabled() {
+        String serviceId = getPackageName() + "/" + TextInjectorService.class.getCanonicalName();
+        try {
+            int enabled = Settings.Secure.getInt(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED);
+            if (enabled == 1) {
+                String enabledServices = Settings.Secure.getString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+                if (enabledServices != null) {
+                    return enabledServices.contains(serviceId);
+                }
+            }
+        } catch (Settings.SettingNotFoundException e) {
+            // Accessibility settings not found
+        }
+        return false;
     }
 
     private void stopFloatingMode() {
@@ -652,11 +677,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1234) {
-            // Check if permission was granted after returning from settings
+            // Check if overlay permission was granted
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
                 startFloatingMode();
             } else {
                 Toast.makeText(this, getString(R.string.overlay_permission_required), Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == 1235) {
+            // Check if accessibility service was enabled
+            if (isAccessibilityServiceEnabled()) {
+                startFloatingMode();
+            } else {
+                Toast.makeText(this, "Accessibility service not enabled", Toast.LENGTH_SHORT).show();
             }
         }
     }

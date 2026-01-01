@@ -49,7 +49,7 @@ class TextInjectorService : AccessibilityService() {
         // Ignore system stuff and our own app (overlay triggers our own window events)
         if (pkg.startsWith("android") || 
             pkg.startsWith("com.android.systemui") ||
-            pkg == "org.woheller69.whisper" ||
+            pkg == "adithyakrish0.whispervoice" ||
             pkg.contains("keyboard") ||
             pkg.contains("inputmethod") ||
             pkg.contains("gboard") ||

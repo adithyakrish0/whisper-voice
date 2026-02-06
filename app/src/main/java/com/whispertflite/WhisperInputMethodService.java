@@ -25,6 +25,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
@@ -51,13 +52,14 @@ public class WhisperInputMethodService extends InputMethodService {
     private Whisper mWhisper = null;
     private File sdcardDataFolder = null;
     private File selectedTfliteFile = null;
-    private ProgressBar processingBar = null;
+    private LinearProgressIndicator processingBar = null;
     private SharedPreferences sp = null;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Context mContext;
     private CountDownTimer countDownTimer;
     private static boolean translate = false;
     private boolean modeAuto = false;
+    private boolean isModelLoading = false;
     private LinearLayout layoutButtons;
 
     @Override
@@ -218,7 +220,14 @@ public class WhisperInputMethodService extends InputMethodService {
                 // Pressed
                 handler.post(() -> btnRecord.setBackgroundResource(R.drawable.rounded_button_background_pressed));
                 if (checkRecordPermission()){
-                    if (!mWhisper.isInProgress()) {
+                    if (isModelLoading) {
+                        handler.post(() -> {
+                            tvStatus.setText("Model loading...");
+                            tvStatus.setVisibility(View.VISIBLE);
+                        });
+                        return true;
+                    }
+                    if (mWhisper != null && !mWhisper.isInProgress()) {
                         HapticFeedback.vibrate(this);
                         startRecording();
                         handler.post(() -> processingBar.setProgress(100));
@@ -235,6 +244,12 @@ public class WhisperInputMethodService extends InputMethodService {
                             tvStatus.setText("");
                             tvStatus.setVisibility(View.GONE);
                         });
+                    } else if (mWhisper == null) {
+                        handler.post(() -> {
+                            tvStatus.setText("Initializing...");
+                            tvStatus.setVisibility(View.VISIBLE);
+                        });
+                        initModel(selectedTfliteFile);
                     } else {
                         handler.post(() -> {
                             tvStatus.setText(getString(R.string.please_wait));
@@ -285,39 +300,52 @@ public class WhisperInputMethodService extends InputMethodService {
 
     // Model initialization
     private void initModel(File modelFile) {
-        boolean isMultilingualModel = !(modelFile.getName().endsWith(ENGLISH_ONLY_MODEL_EXTENSION));
-        String vocabFileName = isMultilingualModel ? MULTILINGUAL_VOCAB_FILE : ENGLISH_ONLY_VOCAB_FILE;
-        File vocabFile = new File(sdcardDataFolder, vocabFileName);
+        if (isModelLoading) return;
+        isModelLoading = true;
+        
+        new Thread(() -> {
+            boolean isMultilingualModel = !(modelFile.getName().endsWith(ENGLISH_ONLY_MODEL_EXTENSION));
+            String vocabFileName = isMultilingualModel ? MULTILINGUAL_VOCAB_FILE : ENGLISH_ONLY_VOCAB_FILE;
+            File vocabFile = new File(sdcardDataFolder, vocabFileName);
 
-        mWhisper = new Whisper(this);
-        mWhisper.loadModel(modelFile, vocabFile, isMultilingualModel);
-        Log.d(TAG, "Initialized: " + modelFile.getName());
-        mWhisper.setListener(new Whisper.WhisperListener() {
-            @Override
-            public void onUpdateReceived(String message) {
-            }
-
-            @Override
-            public void onResultReceived(WhisperResult whisperResult) {
-                handler.post(() -> processingBar.setIndeterminate(false));
-                handler.post(() -> {
-                    tvStatus.setText("");
-                    tvStatus.setVisibility(View.GONE);
-                });
-
-                String result = whisperResult.getResult();
-                if (whisperResult.getLanguage().equals("zh")){
-                    boolean simpleChinese = sp.getBoolean("simpleChinese",false);
-                    result = simpleChinese ? ZhConverterUtil.toSimple(result) : ZhConverterUtil.toTraditional(result);
+            mWhisper = new Whisper(this);
+            mWhisper.loadModel(modelFile, vocabFile, isMultilingualModel);
+            Log.d(TAG, "Initialized: " + modelFile.getName());
+            mWhisper.setListener(new Whisper.WhisperListener() {
+                @Override
+                public void onUpdateReceived(String message) {
                 }
-                boolean commitSuccess = false;
-                if (result.trim().length() > 0) commitSuccess = getCurrentInputConnection().commitText(result.trim() + " ",1);
-                if (modeAuto && commitSuccess) handler.postDelayed(() -> switchToPreviousInputMethod(), 100); //slightly delayed, otherwise some apps, e.g. WhatsApp, do not accept the committed text (commitText on inactive InputConnection)
-            }
-        });
+
+                @Override
+                public void onResultReceived(WhisperResult whisperResult) {
+                    handler.post(() -> processingBar.setIndeterminate(false));
+                    handler.post(() -> {
+                        tvStatus.setText("");
+                        tvStatus.setVisibility(View.GONE);
+                    });
+
+                    String result = whisperResult.getResult();
+                    if (whisperResult.getLanguage().equals("zh")){
+                        boolean simpleChinese = sp.getBoolean("simpleChinese",false);
+                        result = simpleChinese ? ZhConverterUtil.toSimple(result) : ZhConverterUtil.toTraditional(result);
+                    }
+                    boolean commitSuccess = false;
+                    if (result.trim().length() > 0) commitSuccess = getCurrentInputConnection().commitText(result.trim() + " ",1);
+                    if (modeAuto && commitSuccess) handler.postDelayed(() -> switchToPreviousInputMethod(), 100); //slightly delayed, otherwise some apps, e.g. WhatsApp, do not accept the committed text (commitText on inactive InputConnection)
+                }
+            });
+            isModelLoading = false;
+        }).start();
     }
 
     private void startTranscription() {
+        if (isModelLoading) {
+            handler.post(() -> {
+                tvStatus.setText("Model loading...");
+                tvStatus.setVisibility(View.VISIBLE);
+            });
+            return;
+        }
         if (countDownTimer!=null) { countDownTimer.cancel();}
         handler.post(() -> processingBar.setProgress(0));
         handler.post(() -> processingBar.setIndeterminate(true));

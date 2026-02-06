@@ -18,6 +18,9 @@ android {
         versionCode 35
         versionName "3.5"
 
+        ndk {
+            abiFilters "arm64-v8a", "armeabi-v7a", "x86", "x86_64"
+        }
     }
 
     buildFeatures {
@@ -35,8 +38,6 @@ android {
         }
     }
 
-    // Removed externalNativeBuild block
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -47,9 +48,7 @@ android {
     }
 
     dependenciesInfo {
-        // Disable including dependency metadata when building APKs
         includeInApk = false
-        // Disable including dependency metadata when building Android App Bundles
         includeInBundle = false
     }
 }
@@ -61,10 +60,12 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.1'
 
     // Main TensorFlow Lite library
-    //noinspection GradleDependency: Crash with 2.16.1, nonsense output with com.google.ai.edge.litert:litert:1.0.1
     implementation 'org.tensorflow:tensorflow-lite:2.15.0'
     implementation 'org.tensorflow:tensorflow-lite-support:0.4.4'
     implementation 'com.github.gkonovalov.android-vad:webrtc:2.0.9'
     implementation 'com.github.houbb:opencc4j:1.8.1'
     implementation 'com.github.woheller69:FreeDroidWarn:V1.3'
+    
+    // Video caption feature - OkHttp for downloading
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }

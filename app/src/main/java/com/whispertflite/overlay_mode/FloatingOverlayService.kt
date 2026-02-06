@@ -13,6 +13,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.ServiceInfo
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.Handler
@@ -29,8 +30,9 @@ import android.view.View
 import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageButton
-import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.view.ContextThemeWrapper
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import androidx.core.app.NotificationCompat
 import androidx.preference.PreferenceManager
 import com.whispertflite.MainActivity
@@ -65,7 +67,7 @@ class FloatingOverlayService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     
     private lateinit var btnMic: ImageButton
-    private lateinit var progressBar: ProgressBar
+    private lateinit var progressBar: CircularProgressIndicator
     private lateinit var pulseRing: View
     
     private var mRecorder: Recorder? = null
@@ -74,6 +76,8 @@ class FloatingOverlayService : Service() {
     
     private var isRecording = false
     private var isProcessing = false
+    private var isModelLoading = false // Track model loading state
+    private var isStopping = false
     private var isOverlayAdded = false
     private var pulseAnimator: AnimatorSet? = null
     
@@ -92,11 +96,19 @@ class FloatingOverlayService : Service() {
         sdcardDataFolder = getExternalFilesDir(null)
         
         createNotificationChannel()
-        startForeground(NOTIFICATION_ID, createNotification())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(NOTIFICATION_ID, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
+        } else {
+            startForeground(NOTIFICATION_ID, createNotification())
+        }
         
         initOverlayView()
         initRecorder()
-        initWhisperModel()
+        
+        // Load model on background thread to avoid ANR/Lags
+        Thread {
+            initWhisperModel()
+        }.start()
         
         BridgeManager.registerOverlayService(this)
     }
@@ -168,7 +180,8 @@ class FloatingOverlayService : Service() {
     }
     
     private fun initOverlayView() {
-        overlayView = (getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater)
+        val themeContext = ContextThemeWrapper(this, R.style.Theme_Whisper_NoActionBar)
+        overlayView = LayoutInflater.from(themeContext)
             .inflate(R.layout.floating_overlay_layout, null)
         
         btnMic = overlayView.findViewById(R.id.btn_mic)
@@ -261,6 +274,9 @@ class FloatingOverlayService : Service() {
     
     private fun handleTap() {
         when {
+            isModelLoading -> {
+                toast("Model still loading, please wait...")
+            }
             isProcessing -> {
                 toast("Still processing...")
             }
@@ -313,11 +329,19 @@ class FloatingOverlayService : Service() {
     }
     
     private fun initWhisperModel() {
-        val modelName = sp.getString("modelName", MainActivity.MULTI_LINGUAL_TOP_WORLD_SLOW) ?: return
+        if (isModelLoading) return
+        isModelLoading = true
+        
+        Log.d(TAG, "Loading Whisper model...")
+        val modelName = sp.getString("modelName", MainActivity.MULTI_LINGUAL_TOP_WORLD_SLOW) ?: run {
+            isModelLoading = false
+            return
+        }
         val modelFile = File(sdcardDataFolder, modelName)
         
         if (!modelFile.exists()) {
             handler.post { toast("Download model first") }
+            isModelLoading = false
             return
         }
         
@@ -363,7 +387,8 @@ class FloatingOverlayService : Service() {
                 }
             })
         }
-        Log.d(TAG, "Model: ${modelFile.name}")
+        Log.d(TAG, "Model Loaded: ${modelFile.name}")
+        isModelLoading = false
     }
     
     private fun startRecording() {

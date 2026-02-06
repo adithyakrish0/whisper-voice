@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,7 +43,7 @@ public class WhisperRecognizeActivity extends AppCompatActivity {
     private ImageButton btnRecord;
     private ImageButton btnCancel;
     private ImageButton btnModeAuto;
-    private ProgressBar processingBar = null;
+    private LinearProgressIndicator processingBar = null;
     private Recorder mRecorder = null;
     private Whisper mWhisper = null;
     private File sdcardDataFolder = null;

@@ -27,6 +27,14 @@
     <string name="multi_lingual_slow">Multi-lingual, slow</string>
     <string name="english_only_fast">English only, fast</string>
     <string name="multi_lingual_fast">Multi-lingual, fast</string>
+    
+    <!-- Semantic Model Names -->
+    <string name="model_whisper_tiny_en">Whisper Tiny English (Fastest)</string>
+    <string name="model_whisper_base">Whisper Base Multi (Balanced)</string>
+    <string name="model_whisper_small">Whisper Small Multi (High Precision)</string>
+    <string name="model_whisper_base_eu">Whisper Base EU (Balanced)</string>
+    <string name="model_whisper_base_world">Whisper Base World (Balanced)</string>
+    <string name="model_whisper_small_world">Whisper Small World (High Precision)</string>
     <string name="mode_transcription">transcription</string>
     <string name="mode_translation">translation</string>
     <string name="instructions">Press and hold the microphone button while speaking.</string>
@@ -44,4 +52,11 @@
     <string name="accessibility_service_description">Whisper Voice Assistant uses accessibility to inject transcribed text into any text field across all apps.</string>
     <string name="overlay_permission_required">Overlay permission is required</string>
     <string name="enable_overlay_permission">Please enable \"Display over other apps\" permission</string>
+    <string name="tap_to_record">Tap to record</string>
+    <string name="recording">Recording</string>
+    <string name="history_title">Transcription History</string>
+    <string name="action_share">Share</string>
+    <string name="action_export">Save TXT</string>
+    <string name="action_close">Close</string>
+    <string name="detail_title">Transcription Detail</string>
 </resources>

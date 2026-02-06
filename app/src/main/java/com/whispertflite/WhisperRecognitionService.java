@@ -42,6 +42,7 @@ public class WhisperRecognitionService extends RecognitionService {
     private File sdcardDataFolder = null;
     private File selectedTfliteFile = null;
     private boolean recognitionCancelled = false;
+    private boolean isModelLoading = false;
     private SharedPreferences sp = null;
 
     @Override
@@ -138,44 +139,55 @@ public class WhisperRecognitionService extends RecognitionService {
 
     // Model initialization
     private void initModel(File modelFile, Callback callback, int langToken) {
-        boolean isMultilingualModel = !(modelFile.getName().endsWith(ENGLISH_ONLY_MODEL_EXTENSION));
-        String vocabFileName = isMultilingualModel ? MULTILINGUAL_VOCAB_FILE : ENGLISH_ONLY_VOCAB_FILE;
-        File vocabFile = new File(sdcardDataFolder, vocabFileName);
+        if (isModelLoading) return;
+        isModelLoading = true;
+        
+        new Thread(() -> {
+            boolean isMultilingualModel = !(modelFile.getName().endsWith(ENGLISH_ONLY_MODEL_EXTENSION));
+            String vocabFileName = isMultilingualModel ? MULTILINGUAL_VOCAB_FILE : ENGLISH_ONLY_VOCAB_FILE;
+            File vocabFile = new File(sdcardDataFolder, vocabFileName);
 
-        mWhisper = new Whisper(this);
-        mWhisper.loadModel(modelFile, vocabFile, isMultilingualModel);
-        Log.d(TAG, "Initialized: " + modelFile.getName());
-        mWhisper.setLanguage(langToken);
-        Log.d(TAG, "Language token " + langToken);
-        mWhisper.setListener(new Whisper.WhisperListener() {
-            @Override
-            public void onUpdateReceived(String message) { }
+            mWhisper = new Whisper(this);
+            mWhisper.loadModel(modelFile, vocabFile, isMultilingualModel);
+            Log.d(TAG, "Initialized: " + modelFile.getName());
+            mWhisper.setLanguage(langToken);
+            Log.d(TAG, "Language token " + langToken);
+            mWhisper.setListener(new Whisper.WhisperListener() {
+                @Override
+                public void onUpdateReceived(String message) { }
 
-            @Override
-            public void onResultReceived(WhisperResult whisperResult) {
-                if (whisperResult.getResult().trim().length() > 0){
-                    Log.d(TAG, whisperResult.getResult().trim());
-                    try {
-                        callback.endOfSpeech();
-                        deinitModel();
-                        Bundle results = new Bundle();
-                        ArrayList<String> resultList = new ArrayList<>();
+                @Override
+                public void onResultReceived(WhisperResult whisperResult) {
+                    if (whisperResult.getResult().trim().length() > 0){
+                        Log.d(TAG, whisperResult.getResult().trim());
+                        try {
+                            callback.endOfSpeech();
+                            deinitModel();
+                            Bundle results = new Bundle();
+                            ArrayList<String> resultList = new ArrayList<>();
 
-                        String result = whisperResult.getResult();
-                        if (whisperResult.getLanguage().equals("zh")){
-                            boolean simpleChinese = sp.getBoolean("RecognitionServiceSimpleChinese",false);
-                            result = simpleChinese ? ZhConverterUtil.toSimple(result) : ZhConverterUtil.toTraditional(result);
+                            String result = whisperResult.getResult();
+                            if (whisperResult.getLanguage().equals("zh")){
+                                boolean simpleChinese = sp.getBoolean("RecognitionServiceSimpleChinese",false);
+                                result = simpleChinese ? ZhConverterUtil.toSimple(result) : ZhConverterUtil.toTraditional(result);
+                            }
+
+                            resultList.add(result.trim());
+                            results.putStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION, resultList);
+                            callback.results(results);
+                        } catch (RemoteException e) {
+                            throw new RuntimeException(e);
                         }
-
-                        resultList.add(result.trim());
-                        results.putStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION, resultList);
-                        callback.results(results);
-                    } catch (RemoteException e) {
-                        throw new RuntimeException(e);
                     }
                 }
+            });
+            isModelLoading = false;
+            
+            // If the recorder already finished (unlikely but possible), start transcription
+            if (mRecorder != null && !mRecorder.isInProgress() && !recognitionCancelled) {
+                startTranscription();
             }
-        });
+        }).start();
     }
 
     private void startRecording() {
@@ -186,6 +198,10 @@ public class WhisperRecognitionService extends RecognitionService {
 
     private void startTranscription() {
         if (!recognitionCancelled){
+            if (isModelLoading || mWhisper == null) {
+                // Wait for model to load
+                return;
+            }
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(()-> {
                 Toast toast = new Toast(this);

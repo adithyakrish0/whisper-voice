@@ -10,4 +10,5 @@ public interface WhisperEngine {
     void initialize(String modelPath, String vocabPath, boolean multilingual) throws IOException;
     void deinitialize();
     WhisperResult processRecordBuffer(Whisper.Action mAction, int mLangToken);
+    WhisperResult processRecordBuffer(Whisper.Action mAction, int mLangToken, int startSample);
 }

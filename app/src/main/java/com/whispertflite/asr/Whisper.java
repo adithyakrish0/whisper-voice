@@ -42,6 +42,7 @@ public class Whisper {
     private final Lock taskLock = new ReentrantLock();
     private final Condition hasTask = taskLock.newCondition();
     private volatile boolean taskAvailable = false;
+    private int mStartSample = 0;
 
     public Whisper(Context context) {
         this.mWhisperEngine = new WhisperEngineJava(context);
@@ -88,10 +89,15 @@ public class Whisper {
     }
 
     public void start() {
+        start(0);
+    }
+
+    public void start(int startSample) {
         if (!mInProgress.compareAndSet(false, true)) {
             Log.d(TAG, "Execution is already in progress...");
             return;
         }
+        this.mStartSample = startSample;
         taskLock.lock();
         try {
             taskAvailable = true;
@@ -116,8 +122,8 @@ public class Whisper {
                 while (!taskAvailable) {
                     hasTask.await();
                 }
-                processRecordBuffer();
                 taskAvailable = false;
+                processRecordBuffer();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } finally {
@@ -134,8 +140,9 @@ public class Whisper {
 
                 WhisperResult whisperResult = null;
                 synchronized (mWhisperEngine) {
-                    whisperResult = mWhisperEngine.processRecordBuffer(mAction, mLangToken);
+                    whisperResult = mWhisperEngine.processRecordBuffer(mAction, mLangToken, mStartSample);
                 }
+                mInProgress.set(false);
                 sendResult(whisperResult);
 
                 long timeTaken = System.currentTimeMillis() - startTime;

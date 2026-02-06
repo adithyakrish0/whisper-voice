@@ -1,468 +1,497 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modern monochromatic ChatGPT-style main activity -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#1A1A1A"
+    android:background="?attr/colorSurface"
     android:fitsSystemWindows="true">
 
-    <!-- Header -->
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="16dp"
-        android:background="#1A1A1A">
-        
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Whisper Voice"
-            android:textSize="20sp"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
-        
-        <ImageButton
-            android:id="@+id/btnInfo"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_info_48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:tint="#888888"
-            android:contentDescription="@string/info" />
-    </LinearLayout>
+        android:layout_height="220dp"
+        android:background="?attr/colorSurface"
+        android:fitsSystemWindows="true">
 
-    <!-- Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#2A2A2A" />
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:contentScrim="?attr/colorSurface"
+            app:expandedTitleGravity="bottom|start"
+            app:expandedTitleMarginBottom="64dp"
+            app:expandedTitleMarginStart="32dp"
+            app:expandedTitleMarginTop="64dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:title="Whisper Voice"
+            app:collapsedTitleGravity="start"
+            app:expandedTitleTextAppearance="@style/TextAppearance.Material3.DisplaySmall"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.Material3.TitleLarge">
 
-    <!-- Main content -->
-    <ScrollView
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:menu="@null">
+                
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:orientation="horizontal"
+                    android:paddingEnd="16dp">
+
+                    <ImageButton
+                        android:id="@+id/btnGitHub"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_github"
+                        app:tint="?attr/colorOnSurfaceVariant"
+                        android:contentDescription="GitHub" />
+                </LinearLayout>
+
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true">
-        
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="24dp"
+            android:clipToPadding="false">
 
-            <!-- Model Selection Card -->
-            <LinearLayout
+            <!-- Hero Feature: Video Transcription -->
+            <!-- Using surfaceContainerHigh for elevation against the main surface -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnVideoCaption"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/card_background"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
-                
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/select_model"
-                    android:textSize="14sp"
-                    android:textColor="#888888"
-                    android:layout_marginBottom="8dp" />
-                
-                <Spinner
-                    android:id="@+id/spnrTfliteFiles"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/spinner_background"
-                    android:popupBackground="#2A2A2A" />
-            </LinearLayout>
+                android:layout_height="140dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="24dp"
+                app:cardBackgroundColor="@color/md_theme_dark_surfaceContainerHigh"
+                app:strokeWidth="0dp"
+                app:cardElevation="0dp">
 
-            <!-- Language Selection Card -->
-            <LinearLayout
-                android:id="@+id/layout_language"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/card_background"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
-                
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/language"
-                    android:textSize="14sp"
-                    android:textColor="#888888"
-                    android:layout_marginBottom="8dp" />
-                
-                <Spinner
-                    android:id="@+id/spnrLanguage"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/spinner_background"
-                    android:popupBackground="#2A2A2A" />
-            </LinearLayout>
+                    android:layout_height="match_parent"
+                    android:padding="24dp">
 
-            <!-- GLOBAL OPTIONS Card (affects all modes) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/card_background"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
-                
-                <!-- Translate Option - GLOBAL -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-                    
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-                        
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/translate"
-                            android:textSize="16sp"
-                            android:textColor="#E0E0E0" />
-                        
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Translate any language to English"
-                            android:textSize="12sp"
-                            android:textColor="#666666" />
-                    </LinearLayout>
-                    
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/mode_translate"
+                    <TextView
+                        android:id="@+id/tvHeroTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:thumbTint="#FFFFFF"
-                        android:trackTint="#3A3A3A" />
-                </LinearLayout>
-            </LinearLayout>
+                        android:text="Video\nTranscription"
+                        android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textStyle="bold" />
 
-            <!-- KEYBOARD MODE OPTIONS Card -->
-            <!-- KEYBOARD MODE OPTIONS Card -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/card_background"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
-                
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Keyboard Mode"
-                    android:textSize="14sp"
-                    android:textColor="#888888"
-                    android:layout_marginBottom="12dp" />
-                
-                <!-- Append Option - keyboard only -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-                    
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-                        
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/append"
-                            android:textSize="16sp"
-                            android:textColor="#E0E0E0" />
-                        
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Add text instead of replacing"
-                            android:textSize="12sp"
-                            android:textColor="#666666" />
-                    </LinearLayout>
-                    
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/mode_append"
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:thumbTint="#FFFFFF"
-                        android:trackTint="#3A3A3A" />
-                </LinearLayout>
-                
-                <!-- Hidden options (kept for compatibility) -->
-                <LinearLayout
-                    android:id="@+id/layout_tts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:orientation="horizontal">
-                    <CheckBox android:id="@+id/mode_tts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone" />
-                </LinearLayout>
-                
-                <LinearLayout
-                    android:id="@+id/layout_mode_chinese"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:orientation="horizontal">
-                    <CheckBox android:id="@+id/mode_simple_chinese" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone" />
-                </LinearLayout>
-            </LinearLayout>
+                        android:layout_below="@id/tvHeroTitle"
+                        android:layout_marginTop="8dp"
+                        android:text="Process local media"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
 
-            <!-- FLOATING MODE OPTIONS Card -->
+                    <LinearLayout
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/record_button_background"
+                        android:backgroundTint="?attr/colorPrimaryContainer"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_mic_white"
+                            app:tint="?attr/colorOnPrimaryContainer" />
+                    </LinearLayout>
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Quick Actions Grid -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/card_background"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
-                
-                <TextView
-                    android:layout_width="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:baselineAligned="false">
+
+                <!-- Floating Mode -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnFloatingModeLayout"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Floating Mode"
-                    android:textSize="14sp"
-                    android:textColor="#888888"
-                    android:layout_marginBottom="12dp" />
-                
-                <!-- Button Size Option -->
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardBackgroundColor="@color/md_theme_dark_surfaceContainer"
+                    app:strokeWidth="0dp"
+                    app:cardElevation="0dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <LinearLayout
+                        android:id="@+id/btnFloatingMode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_mic_white"
+                            app:tint="?attr/colorPrimary" />
+
+                        <TextView
+                            android:id="@+id/tvFloatingMode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="Floating\nMode"
+                            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                            android:textColor="?attr/colorOnSurface" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Select Apps -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnWhitelistLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardBackgroundColor="@color/md_theme_dark_surfaceContainer"
+                    app:strokeWidth="0dp"
+                    app:cardElevation="0dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <LinearLayout
+                        android:id="@+id/btnWhitelist"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="20dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_arrow_back"
+                            android:rotation="180"
+                            app:tint="?attr/colorPrimary" />
+
+                        <TextView
+                            android:id="@+id/tvWhitelist"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="Select\nApps"
+                            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                            android:textColor="?attr/colorOnSurface" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Engine Configuration"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                android:textColor="?attr/colorPrimary"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Configuration Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="24dp"
+                app:cardBackgroundColor="@color/md_theme_dark_surfaceContainerLow"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/md_theme_dark_outline"
+                app:cardElevation="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-                    
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Button Size"
-                        android:textSize="16sp"
-                        android:textColor="#E0E0E0"
-                        android:layout_marginBottom="12dp" />
-                    
-                    <!-- Size selector buttons -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center">
-                        
-                        <Button
-                            android:id="@+id/btnSizeSmall"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="4dp"
-                            android:text="Small"
-                            android:textSize="12sp"
-                            android:textColor="#AAAAAA"
-                            android:background="@drawable/button_dark"
-                            android:textAllCaps="false" />
-                        
-                        <Button
-                            android:id="@+id/btnSizeMedium"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:layout_marginHorizontal="4dp"
-                            android:text="Medium"
-                            android:textSize="12sp"
-                            android:textColor="#FFFFFF"
-                            android:background="@drawable/button_dark"
-                            android:textAllCaps="false" />
-                        
-                        <Button
-                            android:id="@+id/btnSizeLarge"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:layout_marginStart="4dp"
-                            android:text="Large"
-                            android:textSize="12sp"
-                            android:textColor="#AAAAAA"
-                            android:background="@drawable/button_dark"
-                            android:textAllCaps="false" />
-                    </LinearLayout>
-                    
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Restart floating mode to apply"
-                        android:textSize="11sp"
-                        android:textColor="#555555"
-                        android:layout_marginTop="8dp" />
-                </LinearLayout>
-            </LinearLayout>
 
-            <!-- Status Card -->
-            <LinearLayout
+                    <!-- Model Row -->
+                    <LinearLayout
+                        android:id="@+id/btnSelectModel"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="20dp">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_mic_white"
+                            app:tint="?attr/colorPrimary" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="20dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Recognition Model"
+                                android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:id="@+id/tvSelectedModel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Whisper Base (Balanced)"
+                                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_arrow_back"
+                            android:rotation="180"
+                            app:tint="?attr/colorOnSurfaceVariant"
+                            android:alpha="0.5"/>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutline" android:alpha="0.1" android:layout_marginHorizontal="20dp"/>
+
+                    <!-- Language Row -->
+                    <LinearLayout
+                        android:id="@+id/btnSelectLanguage"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="20dp">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_arrow_back"
+                            app:tint="?attr/colorPrimary" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="20dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Source Language"
+                                android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:id="@+id/tvSelectedLanguage"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Detect language"
+                                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_arrow_back"
+                            android:rotation="180"
+                            app:tint="?attr/colorOnSurfaceVariant"
+                            android:alpha="0.5"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tools"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                android:textColor="?attr/colorPrimary"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Tools Card -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/card_background"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
-                
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="@color/md_theme_dark_surfaceContainerLow"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/md_theme_dark_outline"
+                app:cardElevation="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-                    
-                    <TextView
-                        android:id="@+id/tvStatusTitle"
-                        android:layout_width="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Translate Toggle -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="72dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="20dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Translate to English"
+                                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                                android:textColor="?attr/colorOnSurface" />
+                        </LinearLayout>
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/mode_translate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutline" android:alpha="0.2" android:layout_marginHorizontal="20dp"/>
+
+                    <!-- Append Toggle -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="72dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="20dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Append Text"
+                                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                                android:textColor="?attr/colorOnSurface" />
+                        </LinearLayout>
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/mode_append"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Status Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/md_theme_dark_surfaceContainer"
+                app:cardElevation="0dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:gravity="center">
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/processing_bar"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/status"
-                        android:textSize="14sp"
-                        android:textColor="#888888" />
-                    
+                        android:visibility="invisible" />
+
                     <TextView
                         android:id="@+id/tvStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textSize="14sp"
-                        android:textColor="#4CAF50" />
-                </LinearLayout>
-                
-                <ProgressBar
-                    android:id="@+id/processing_bar"
-                    android:layout_width="match_parent"
-                    android:layout_height="4dp"
-                    android:layout_marginTop="12dp"
-                    android:indeterminate="false"
-                    android:progressTint="#FFFFFF"
-                    android:progressBackgroundTint="#3A3A3A"
-                    style="@android:style/Widget.ProgressBar.Horizontal" />
-            </LinearLayout>
+                        android:text="Ready"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginTop="12dp" />
 
-            <!-- Result Card -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/card_background"
-                android:padding="16dp"
-                android:minHeight="100dp">
-                
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="8dp">
-                    
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Transcription"
-                        android:textSize="14sp"
-                        android:textColor="#888888" />
-                    
-                    <ImageButton
-                        android:id="@+id/fabCopy"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/ic_copy"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:tint="#888888"
-                        android:contentDescription="@string/copy_to_clipboard" />
-                </LinearLayout>
-                
-                <ScrollView
-                    android:id="@+id/scrollView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxHeight="150dp">
-                    
                     <TextView
                         android:id="@+id/tvResult"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/instructions"
-                        android:textSize="16sp"
-                        android:textColor="#E0E0E0"
-                        android:lineSpacingMultiplier="1.3" />
-                </ScrollView>
-            </LinearLayout>
-
-        </LinearLayout>
-    </ScrollView>
-
-    <!-- Bottom Action Bar -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="#1A1A1A"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="24dp">
-        
-        <!-- Record Button -->
-        <ImageButton
-            android:id="@+id/btnRecord"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_mic_white"
-            android:background="@drawable/record_button_background"
-            android:scaleType="centerInside"
-            android:padding="16dp"
-            android:contentDescription="@string/record_button" />
-        
-        <!-- Action Buttons Row -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="12dp"
-            android:gravity="center">
+                        android:layout_marginTop="8dp"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                        android:maxLines="10"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:text="" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
             
-            <!-- Floating Mode Button -->
-            <Button
-                android:id="@+id/btnFloatingMode"
-                android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                android:text="@string/start_floating_mode"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:background="@drawable/button_dark"
-                android:textAllCaps="false" />
-                
-            <!-- Whitelist Apps Button -->
-            <Button
-                android:id="@+id/btnWhitelist"
-                android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                android:text="Select Apps"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:background="@drawable/button_dark"
-                android:textAllCaps="false" />
-        </LinearLayout>
-    </LinearLayout>
+            <Space android:layout_width="match_parent" android:layout_height="100dp"/>
 
-</LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabRecord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:src="@drawable/ic_mic_white"
+        app:backgroundTint="?attr/colorPrimaryContainer"
+        app:tint="?attr/colorOnPrimaryContainer"
+        app:elevation="4dp"
+        app:fabSize="normal"
+        android:contentDescription="Record" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

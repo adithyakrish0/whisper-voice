@@ -74,9 +74,14 @@ public class WhisperEngineJava implements WhisperEngine {
 
     @Override
     public WhisperResult processRecordBuffer(Whisper.Action mAction, int mLangToken) {
+        return processRecordBuffer(mAction, mLangToken, 0);
+    }
+
+    @Override
+    public WhisperResult processRecordBuffer(Whisper.Action mAction, int mLangToken, int startSample) {
         // Calculate Mel spectrogram
-        Log.d(TAG, "Calculating Mel spectrogram...");
-        float[] melSpectrogram = getMelSpectrogram();
+        Log.d(TAG, "Calculating Mel spectrogram from offset " + startSample + "...");
+        float[] melSpectrogram = getMelSpectrogram(startSample);
         Log.d(TAG, "Mel spectrogram is calculated...!");
 
         // Perform inference
@@ -105,11 +110,11 @@ public class WhisperEngineJava implements WhisperEngine {
         Log.d(TAG, "Model loaded with CPU");
     }
 
-    private float[] getMelSpectrogram() {
+    private float[] getMelSpectrogram(int startSample) {
         // Get samples in PCM_FLOAT format
-        float[] samples = RecordBuffer.getSamples();
-
         int fixedInputSize = WhisperUtil.WHISPER_SAMPLE_RATE * WhisperUtil.WHISPER_CHUNK_SIZE;
+        float[] samples = RecordBuffer.getSamples(startSample, Math.min(fixedInputSize, (RecordBuffer.getOutputBuffer().length / 2) - startSample));
+
         float[] inputSamples = new float[fixedInputSize];
         int copyLength = Math.min(samples.length, fixedInputSize);
         System.arraycopy(samples, 0, inputSamples, 0, copyLength);
@@ -124,9 +129,12 @@ public class WhisperEngineJava implements WhisperEngine {
         // Create input tensor
         Tensor inputTensor = mInterpreter.getInputTensor(0);
 
-        // Create output tensor
+        // Create output buffer (Direct ByteBuffer for INT32 support)
         Tensor outputTensor = mInterpreter.getOutputTensor(0);
-        TensorBuffer outputBuffer = TensorBuffer.createFixedSize(outputTensor.shape(), DataType.FLOAT32);
+        int outputSize = 1;
+        for (int dim : outputTensor.shape()) outputSize *= dim;
+        ByteBuffer outputBuffer = ByteBuffer.allocateDirect(outputSize * Integer.BYTES);
+        outputBuffer.order(ByteOrder.nativeOrder());
 
         // Load input data
         int inputSize = inputTensor.shape()[0] * inputTensor.shape()[1] * inputTensor.shape()[2] * Float.BYTES;
@@ -157,7 +165,7 @@ public class WhisperEngineJava implements WhisperEngine {
 
         Map<String, Object> outputsMap = new HashMap<>();
         String[] outputs = mInterpreter.getSignatureOutputs(signature_key);
-        outputsMap.put(outputs[0], outputBuffer.getBuffer());
+        outputsMap.put(outputs[0], outputBuffer);
 
         // Run inference
         try {
@@ -170,11 +178,13 @@ public class WhisperEngineJava implements WhisperEngine {
         ArrayList<InputLang> inputLangList = InputLang.getLangList();
         String language = "";
         Whisper.Action task = null;
-        int outputLen = outputBuffer.getIntArray().length;
+        outputBuffer.rewind();
+        IntBuffer intBuffer = outputBuffer.asIntBuffer();
+        int outputLen = intBuffer.remaining();
         Log.d(TAG, "output_len: " + outputLen);
         List<byte[]> resultArray = new ArrayList<>();
         for (int i = 0; i < outputLen; i++) {
-            int token = outputBuffer.getBuffer().getInt();
+            int token = intBuffer.get();
             if (token == mWhisperUtil.getTokenEOT())
                 break;
 

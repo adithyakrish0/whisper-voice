@@ -25,16 +25,15 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:textSize="16sp"
-        android:textColor="#E0E0E0"
+        android:textColor="?attr/colorOnSurface"
         android:maxLines="1"
         android:ellipsize="end" />
     
-    <!-- Simple Switch instead of Checkbox for cleaner look -->
-    <androidx.appcompat.widget.SwitchCompat
+    <!-- Material Switch -->
+    <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/app_checkbox"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:thumbTint="#FFFFFF"
-        android:trackTint="#3A3A3A" />
+        android:layout_height="wrap_content" />
+
 
 </LinearLayout>
